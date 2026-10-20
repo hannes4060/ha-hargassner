@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Hargassner verbinden",
+        "description": "IP-Adresse der Kesselsteuerung (Telnet, meist Port 23).",
+        "data": { "host": "Host / IP", "port": "Port" }
+      }
+    },
+    "error": {
+      "cannot_connect": "Keine Verbindung oder keine Daten (pm-Zeilen) empfangen."
+    },
+    "abort": { "already_configured": "Dieser Kessel ist bereits eingerichtet." }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen",
+        "data": { "update_interval": "Aktualisierungsintervall (Sekunden)" }
+      }
+    }
+  }
+}
