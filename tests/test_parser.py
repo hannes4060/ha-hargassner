@@ -44,3 +44,42 @@ def test_rejects_garbage():
     assert parser.parse_line("") is None
     assert parser.parse_line("xyz 1 2 3") is None
     assert parser.parse_line("pm") is None
+
+
+# Cloud-Export 21.10.2026, Zeile "13:30" (Kessel im Abbrand).
+# Sample = Telnet-Zeilen 13:30:00-13:34:59.
+CLOUD_ABBRAND = {
+    "kessel_ist": 74.7,
+    "rauchgas": 222.3,
+    "leistung": 95.0,
+    "o2_ist": 6.2,
+    "o2_soll": 5.8,
+    "ruecklauf_ist": 67.9,
+    "hoechste_anforderung": 56.0,
+    "aussen": 13.1,
+    "hk1_vorlauf_ist": 38.6,
+    "puffer_oben": 38.3,
+    "puffer_mitte": 30.8,
+    "puffer_unten": 31.1,
+    "puffer_fuellgrad": 25.3,
+    "puffer_anforderung": 0,
+    "boiler1": 59.9,
+}
+
+
+def test_abbrand_matches_cloud():
+    lines = (ROOT / "tests/sample_abbrand.txt").read_text().splitlines()
+    telegrams = [t for t in (parser.parse_line(l) for l in lines) if t]
+    assert len(telegrams) > 200
+    # Die Cloud tastet je Wert zu leicht unterschiedlichen Zeitpunkten gegen
+    # Intervallende ab: Der Cloud-Wert muss in der Spanne des Intervalls liegen.
+    for key, expected in CLOUD_ABBRAND.items():
+        vals = [t.values[key] for t in telegrams]
+        assert min(vals) - 0.5 <= expected <= max(vals) + 0.5, (key, min(vals), max(vals), expected)
+
+
+def test_zustand_text():
+    assert parser.zustand_text(1.0) == "Aus"
+    assert parser.zustand_text(6.0) == "Heizen"
+    assert parser.zustand_text(99.0) == "Zustand 99"
+    assert parser.zustand_text(None) is None

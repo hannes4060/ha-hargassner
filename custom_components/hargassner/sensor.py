@@ -7,7 +7,12 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfTemperature
+from homeassistant.const import (
+    PERCENTAGE,
+    REVOLUTIONS_PER_MINUTE,
+    EntityCategory,
+    UnitOfTemperature,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -15,7 +20,7 @@ from . import HargassnerConfigEntry
 from .client import HargassnerClient
 from .const import MAX_RAW_FIELDS
 from .entity import HargassnerEntity
-from .parser import FIELDS, KNOWN_INDICES, FieldDef
+from .parser import FIELDS, KESSEL_ZUSTAENDE, KNOWN_INDICES, FieldDef, zustand_text
 
 
 async def async_setup_entry(
@@ -49,19 +54,33 @@ class HargassnerSensor(HargassnerEntity, SensorEntity):
         elif field.kind == "percent":
             self._attr_native_unit_of_measurement = PERCENTAGE
             self._attr_state_class = SensorStateClass.MEASUREMENT
-        elif field.kind == "raw":
-            self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        elif field.kind == "rpm":
+            self._attr_native_unit_of_measurement = REVOLUTIONS_PER_MINUTE
+            self._attr_state_class = SensorStateClass.MEASUREMENT
+        elif field.kind == "state":
+            self._attr_icon = "mdi:fire"
 
-    @property
-    def native_value(self):
+    def _raw(self):
         telegram = self._client.latest
         if telegram is None:
             return None
         return telegram.values.get(self._field.key)
 
     @property
+    def native_value(self):
+        value = self._raw()
+        if self._field.kind == "state":
+            return zustand_text(value)
+        return value
+
+    @property
     def extra_state_attributes(self):
-        return {"feldindex": self._field.index, "verifiziert": self._field.verified}
+        attrs = {"feldindex": self._field.index, "verifiziert": self._field.verified}
+        if self._field.kind == "state":
+            value = self._raw()
+            attrs["code"] = int(value) if isinstance(value, float) else value
+            attrs["bekannte_zustaende"] = KESSEL_ZUSTAENDE
+        return attrs
 
 
 class HargassnerRawSensor(HargassnerEntity, SensorEntity):

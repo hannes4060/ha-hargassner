@@ -18,17 +18,45 @@ class FieldDef:
     index: int
     name: str
     unit: str | None = None
-    kind: str = "temperature"  # temperature | percent | number | raw
+    kind: str = "temperature"  # temperature | percent | rpm | state
     verified: bool = True  # gegen Cloud-Export abgeglichen
 
 
-# Abgeglichen gegen Cloud-Export vom 20.10.2026 (Neo HV 30, Stillstand).
-# verified=False: Position plausibel, aber im Stillstand nicht eindeutig (Wert 0),
-# muss mit einem Mitschnitt im Abbrand bestätigt werden.
+# Kesselzustände (Feld 1), beobachtet beim Neo HV 30.
+# 1 ist sicher (Stillstand). Die übrigen Namen sind aus dem Verlauf abgeleitet
+# (Saugzug, Luftklappen, Rauchgas) und noch mit dem Display zu bestätigen.
+KESSEL_ZUSTAENDE: dict[int, str] = {
+    1: "Aus",
+    4: "Anheizen",
+    6: "Heizen",
+    13: "Heiztür offen",
+}
+
+
+def zustand_text(value: float | str | None) -> str | None:
+    """Übersetzt den Zahlenwert aus Feld 1 in einen Klartext."""
+    if value is None:
+        return None
+    try:
+        code = int(float(value))
+    except ValueError:
+        return str(value)
+    return KESSEL_ZUSTAENDE.get(code, f"Zustand {code}")
+
+
+# verified=True: gegen Cloud-Export abgeglichen
+#   (20.10.2026 Stillstand, 21.10.2026 12:20-14:24 inkl. Abbrand).
+# verified=False: aus dem Verlauf abgeleitet, nicht in der Cloud vorhanden.
 FIELDS: tuple[FieldDef, ...] = (
-    FieldDef("kessel_zustand", 1, "Kesselzustand", None, "raw", False),
+    FieldDef("kessel_zustand", 1, "Kesselzustand", None, "state", False),
     FieldDef("o2_ist", 2, "Sauerstoffgehalt Ist", "%", "percent"),
-    FieldDef("o2_soll", 3, "Sauerstoffgehalt Soll", "%", "percent", False),
+    FieldDef("o2_soll", 3, "Sauerstoffgehalt Soll", "%", "percent"),
+    FieldDef("leistung", 9, "Leistung", "%", "percent"),
+    FieldDef("saugzug", 26, "Saugzug Drehzahl", "U/min", "rpm", False),
+    FieldDef("primaerluft", 21, "Primärluft", "%", "percent", False),
+    FieldDef("sekundaerluft", 23, "Sekundärluft", "%", "percent", False),
+    FieldDef("hoechste_anforderung", 34, "Höchste Anforderung", "°C"),
+    FieldDef("puffer_anforderung", 35, "Höchste Anforderung Puffer", "°C"),
     FieldDef("kessel_ist", 4, "Kesseltemperatur Ist", "°C"),
     FieldDef("kessel_soll", 5, "Kesseltemperatur Soll", "°C"),
     FieldDef("ruecklauf_ist", 6, "Rücklauftemperatur Ist", "°C"),
