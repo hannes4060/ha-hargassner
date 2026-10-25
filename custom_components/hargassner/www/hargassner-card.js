@@ -11,7 +11,7 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.4.4";
+const CARD_VERSION = "0.4.5";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
@@ -179,7 +179,10 @@ class HargassnerCard extends HTMLElement {
     const kColor = tempColor(d.kessel_ist, 30, 85);
     const fill = d.puffer_fuellgrad;
     const fillY = 104 + 160 * (1 - Math.max(0, Math.min(100, fill || 0)) / 100);
-    const hkOn = d._hk ? d._hk === "Heizen" : d.hk1_vorlauf_soll !== null && d.hk1_vorlauf_soll > 0;
+    const hkOn =
+      d._hk === "Heizen" ? true
+      : d._hk === "Aus" ? false
+      : d.hk1_vorlauf_soll !== null && d.hk1_vorlauf_soll !== undefined && d.hk1_vorlauf_soll > 0;
     const title = this._config.title ? `<div class="title">${this._config.title}</div>` : "";
 
     this.shadowRoot.innerHTML = `
@@ -357,7 +360,9 @@ const STYLE = `
   .fillline { stroke:#ece9e1; stroke-width:1; stroke-dasharray:4 4; opacity:.7; }
   .coil path { fill:none; stroke:#f2e6e6; stroke-width:2; opacity:.75; }
   .box { fill:var(--hg-panel); stroke:#3a3d46; }
-  .sun { fill:#4a4d55; } .sun.on { fill:var(--hg-yellow); filter:drop-shadow(0 0 4px var(--hg-yellow)); }
+  .sun { fill:#4a4d55; transition:fill .4s; }
+  .sun.on { fill:var(--hg-yellow); filter:drop-shadow(0 0 5px var(--hg-yellow)); animation:sunglow 2.4s ease-in-out infinite; }
+  @keyframes sunglow { 0%,100% { filter:drop-shadow(0 0 3px var(--hg-yellow)); } 50% { filter:drop-shadow(0 0 8px var(--hg-yellow)); } }
   .vals { margin-top:10px; border-top:1px solid #2e3139; padding-top:8px; display:grid; gap:5px; }
   .row { display:grid; grid-template-columns: 1.3fr .7fr .7fr 1.6fr; align-items:center; gap:8px; font-size:13px; }
   .row.hdr { color:var(--hg-dim); font-size:11.5px; }
@@ -372,7 +377,7 @@ const STYLE = `
                         100% { opacity:.9; translate:1px 0; } }
   @keyframes smoke { 0%,100% { transform:translateY(0); opacity:.35; } 50% { transform:translateY(-4px); opacity:.7; } }
   @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.45; } }
-  @media (prefers-reduced-motion: reduce) { .flame, .smoke, .state.hot i { animation:none; } }
+  @media (prefers-reduced-motion: reduce) { .flame, .smoke, .sun.on, .glow, .state.hot i { animation:none; } }
 `;
 
 if (!customElements.get("hargassner-card")) {

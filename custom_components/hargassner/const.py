@@ -12,4 +12,4 @@ DEFAULT_UPDATE_INTERVAL = 10  # Sekunden; Kessel sendet ca. 1x pro Sekunde
 MAX_RAW_FIELDS = 120
 
 # Version der Lovelace-Karte (Cache-Busting im Browser)
-CARD_VERSION = "0.4.4"
+CARD_VERSION = "0.4.5"

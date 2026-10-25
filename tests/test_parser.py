@@ -100,9 +100,9 @@ def test_anheizen_matches_display():
 
 
 def test_hk1():
-    """Mitschnitt 21.10.2026: HK heizt (Feld 54 = 40, Feld 57 = 3), danach aus."""
+    """HK heizt: Feld 54 = Vorlauf-Soll 40, Feld 57 = 1 (Heizen, Display bestätigt)."""
     parts = ["pm"] + ["0"] * 80
-    parts[54], parts[57] = "40", "3"
+    parts[54], parts[57] = "40", "1"
     t = parser.parse_line(" ".join(parts))
     assert t.values["hk1_vorlauf_soll"] == 40
     assert parser.hk_text(t.values["hk1_status"]) == "Heizen"
