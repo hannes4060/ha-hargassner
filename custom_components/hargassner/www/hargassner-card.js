@@ -11,10 +11,11 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.4.3";
+const CARD_VERSION = "0.4.4";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
+const GLOW = new Set(["Restwärme"]);
 
 // Temperatur -> Farbe wie im Display: kalt blau, mittel violett, heiß rot
 function tempColor(t, cold = 30, hot = 65) {
@@ -241,6 +242,7 @@ class HargassnerCard extends HTMLElement {
             ${burning ? `<g clip-path="url(#hg-fire)">${this._flames(d.leistung)}</g>
               <rect x="58" y="236" width="92" height="5" rx="2" fill="url(#hg-ember)"/>
               <text x="104" y="204" class="t mid outline" text-anchor="middle">${fmt(d.leistung, 0, "%")}</text>` : ""}
+            ${GLOW.has(st) ? `<rect x="58" y="230" width="92" height="10" rx="4" fill="url(#hg-ember)" class="glow"/>` : ""}
 
             <!-- Rücklauf / Vorlauf Leitungen -->
             <path d="M194 120 H252" class="line hot"/>
@@ -343,6 +345,7 @@ const STYLE = `
   .ring { fill:none; stroke:#8c7b58; stroke-width:1; }
   .grate { fill:#141519; stroke:#2c2f36; }
   .flame { animation:flicker 1.2s ease-in-out infinite alternate; }
+  .glow { animation:pulse 2.4s ease-in-out infinite; }
   .flame.f1 { fill:#f08a1c; } .flame.f2 { fill:#e8541a; } .flame.f3 { fill:#ffd25a; }
   .line { stroke-width:5; fill:none; } .line.hot { stroke:var(--hg-red); } .line.cold { stroke:var(--hg-blue); }
   .pump { fill:#20232a; stroke:#d8d4cc; stroke-width:2.5; }

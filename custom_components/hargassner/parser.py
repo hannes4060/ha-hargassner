@@ -28,6 +28,7 @@ KESSEL_ZUSTAENDE: dict[int, str] = {
     1: "Aus",
     4: "Anheizen",
     6: "Leistungsbrand",
+    11: "Restwärme",
     13: "Tür offen",
 }
 
