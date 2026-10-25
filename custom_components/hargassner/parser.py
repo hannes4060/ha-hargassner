@@ -32,15 +32,32 @@ KESSEL_ZUSTAENDE: dict[int, str] = {
 }
 
 
-def zustand_text(value: float | str | None) -> str | None:
-    """Übersetzt den Zahlenwert aus Feld 1 in einen Klartext."""
+# Status Heizkreis 1 (Feld 57), aus dem Verlauf abgeleitet:
+# 3 solange Vorlauf-Soll > 0, 4 nach dem Abschalten (0/9 kurz beim Wechsel).
+HK_ZUSTAENDE: dict[int, str] = {
+    3: "Heizen",
+    4: "Aus",
+}
+
+
+def _text(value: float | str | None, table: dict[int, str]) -> str | None:
     if value is None:
         return None
     try:
         code = int(float(value))
     except ValueError:
         return str(value)
-    return KESSEL_ZUSTAENDE.get(code, f"Zustand {code}")
+    return table.get(code, f"Zustand {code}")
+
+
+def zustand_text(value: float | str | None) -> str | None:
+    """Übersetzt den Zahlenwert aus Feld 1 in einen Klartext."""
+    return _text(value, KESSEL_ZUSTAENDE)
+
+
+def hk_text(value: float | str | None) -> str | None:
+    """Übersetzt den Zahlenwert aus Feld 57 (Heizkreis 1) in einen Klartext."""
+    return _text(value, HK_ZUSTAENDE)
 
 
 # verified=True: gegen Cloud-Export (20./21.10.2026) oder Displayfotos
@@ -60,7 +77,8 @@ FIELDS: tuple[FieldDef, ...] = (
     FieldDef("sekundaerluft", 23, "Sekundärluft Ist", "%", "percent"),
     FieldDef("puffer_soll_tpo", 41, "Puffer Solltemperatur TPO", "°C", "temperature", False),
     FieldDef("puffer_aus_tpo", 42, "Puffer Ausschalttemperatur TPO", "°C", "temperature", False),
-    FieldDef("hk1_vorlauf_soll", 59, "Vorlauf Soll HK 1", "°C", "temperature", False),
+    FieldDef("hk1_vorlauf_soll", 54, "Vorlauf Soll HK 1", "°C"),
+    FieldDef("hk1_status", 57, "Status HK 1", None, "hkstate", False),
     FieldDef("hoechste_anforderung", 34, "Höchste Anforderung", "°C"),
     FieldDef("puffer_anforderung", 35, "Höchste Anforderung Puffer", "°C"),
     FieldDef("kessel_ist", 4, "Kesseltemperatur Ist", "°C"),

@@ -96,3 +96,13 @@ def test_anheizen_matches_display():
     assert t.values["primaerluft_soll"] == 85 and t.values["primaerluft"] == 86
     assert t.values["sekundaerluft_soll"] == 5 and t.values["sekundaerluft"] == 4
     assert parser.zustand_text(t.values["kessel_zustand"]) == "Anheizen"
+
+
+def test_hk1():
+    """Mitschnitt 21.10.2026: HK heizt (Feld 54 = 40, Feld 57 = 3), danach aus."""
+    parts = ["pm"] + ["0"] * 80
+    parts[54], parts[57] = "40", "3"
+    t = parser.parse_line(" ".join(parts))
+    assert t.values["hk1_vorlauf_soll"] == 40
+    assert parser.hk_text(t.values["hk1_status"]) == "Heizen"
+    assert parser.hk_text(4.0) == "Aus"

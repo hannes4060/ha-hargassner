@@ -20,7 +20,15 @@ from . import HargassnerConfigEntry
 from .client import HargassnerClient
 from .const import MAX_RAW_FIELDS
 from .entity import HargassnerEntity
-from .parser import FIELDS, KESSEL_ZUSTAENDE, KNOWN_INDICES, FieldDef, zustand_text
+from .parser import (
+    FIELDS,
+    HK_ZUSTAENDE,
+    KESSEL_ZUSTAENDE,
+    KNOWN_INDICES,
+    FieldDef,
+    hk_text,
+    zustand_text,
+)
 
 
 async def async_setup_entry(
@@ -59,6 +67,8 @@ class HargassnerSensor(HargassnerEntity, SensorEntity):
             self._attr_state_class = SensorStateClass.MEASUREMENT
         elif field.kind == "state":
             self._attr_icon = "mdi:fire"
+        elif field.kind == "hkstate":
+            self._attr_icon = "mdi:radiator"
 
     def _raw(self):
         telegram = self._client.latest
@@ -71,6 +81,8 @@ class HargassnerSensor(HargassnerEntity, SensorEntity):
         value = self._raw()
         if self._field.kind == "state":
             return zustand_text(value)
+        if self._field.kind == "hkstate":
+            return hk_text(value)
         return value
 
     @property
@@ -80,10 +92,12 @@ class HargassnerSensor(HargassnerEntity, SensorEntity):
             "feldindex": self._field.index,
             "verifiziert": self._field.verified,
         }
-        if self._field.kind == "state":
+        if self._field.kind in ("state", "hkstate"):
             value = self._raw()
             attrs["code"] = int(value) if isinstance(value, float) else value
-            attrs["bekannte_zustaende"] = KESSEL_ZUSTAENDE
+            attrs["bekannte_zustaende"] = (
+                KESSEL_ZUSTAENDE if self._field.kind == "state" else HK_ZUSTAENDE
+            )
         return attrs
 
 

@@ -11,7 +11,7 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.4.0";
+const CARD_VERSION = "0.4.1";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
@@ -74,6 +74,10 @@ class HargassnerCard extends HTMLElement {
         state = st.state;
         continue;
       }
+      if (k === "hk1_status") {
+        v._hk = st.state;
+        continue;
+      }
       const n = parseFloat(st.state);
       v[k] = Number.isNaN(n) ? null : n;
     }
@@ -127,7 +131,7 @@ class HargassnerCard extends HTMLElement {
     const kColor = tempColor(d.kessel_ist, 30, 85);
     const fill = d.puffer_fuellgrad;
     const fillY = 104 + 160 * (1 - Math.max(0, Math.min(100, fill || 0)) / 100);
-    const hkOn = d.hk1_vorlauf_soll !== null && d.hk1_vorlauf_soll > 0;
+    const hkOn = d._hk ? d._hk === "Heizen" : d.hk1_vorlauf_soll !== null && d.hk1_vorlauf_soll > 0;
     const title = this._config.title ? `<div class="title">${this._config.title}</div>` : "";
 
     this.shadowRoot.innerHTML = `
@@ -235,7 +239,7 @@ class HargassnerCard extends HTMLElement {
             <text x="362" y="242" class="t sm dim">VL Soll</text>
             <text x="462" y="242" class="t sm" text-anchor="end">${fmt(d.hk1_vorlauf_soll, 0, "°C")}</text>
             <text x="362" y="262" class="t sm dim">Status</text>
-            <text x="462" y="262" class="t sm" text-anchor="end">${hkOn ? "Ein" : "Aus"}</text>
+            <text x="462" y="262" class="t sm" text-anchor="end">${d._hk || (hkOn ? "Ein" : "Aus")}</text>
           </svg>
 
           ${this._config.show_values ? `

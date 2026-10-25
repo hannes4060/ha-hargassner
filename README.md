@@ -50,10 +50,11 @@ Abgeglichen gegen den Cloud-Export (Stillstand und Abbrand) und gegen Displayfot
 | Saugzug Drehzahl | 26 | vermutet |
 | Außentemperatur / gemittelt | 32 / 33 | geprüft |
 | Höchste Anforderung | 34 | geprüft |
-| Höchste Anforderung Puffer | 35 | geprüft (Feld 54 verhält sich fast gleich) |
+| Höchste Anforderung Puffer | 35 | geprüft |
 | Puffer Solltemperatur / Ausschalttemperatur TPO | 41 / 42 | vermutet (Display 45 °C) |
 | Vorlauf Ist HK 1 | 53 | geprüft |
-| Vorlauf Soll HK 1 | 59 | vermutet |
+| Vorlauf Soll HK 1 | 54 | geprüft (Display) |
+| Status HK 1 (3 = Heizen, 4 = Aus) | 57 | vermutet |
 | Boiler 1 | 76 | geprüft |
 
 ### Kesselzustand (Feld 1)
