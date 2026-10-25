@@ -12,6 +12,24 @@ den Telnet-Datenstrom (Port 23) aus. Keine Cloud nötig.
 Danach unter *Einstellungen → Geräte & Dienste → Integration hinzufügen → Hargassner (lokal)*
 die IP des Kessels eintragen.
 
+## Lovelace-Karte
+
+Die Integration bringt eine Karte im Stil des Kesseldisplays mit: Kessel mit Brennraum
+und Flammen, Puffer mit Temperaturverlauf, Boiler, Heizkreis 1 und Soll/Ist-Werte.
+Sie wird automatisch geladen, eine Ressource muss nicht eingetragen werden.
+
+![Hargassner-Karte](docs/card.png)
+
+Dashboard bearbeiten → *Karte hinzufügen* → „Hargassner Kessel“, oder per YAML:
+
+```yaml
+type: custom:hargassner-card
+title: Holzvergaser    # optional
+show_values: true      # optional, Soll/Ist-Tabelle
+```
+
+Die Sensoren werden über ihr Attribut `schluessel` gefunden, es ist keine Konfiguration nötig.
+
 ## Sensoren
 
 Abgeglichen gegen den Cloud-Export (Stillstand und Abbrand) und gegen Displayfotos (Anheizen).

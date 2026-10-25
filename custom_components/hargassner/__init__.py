@@ -2,16 +2,41 @@
 
 from __future__ import annotations
 
+import logging
+from pathlib import Path
+
+from homeassistant.components.frontend import add_extra_js_url
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PORT, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType
 
 from .client import HargassnerClient
-from .const import CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+from .const import CARD_VERSION, CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL, DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = [Platform.SENSOR, Platform.BINARY_SENSOR]
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+CARD_URL = "/hargassner/hargassner-card.js"
+CARD_PATH = Path(__file__).parent / "www" / "hargassner-card.js"
 
 type HargassnerConfigEntry = ConfigEntry[HargassnerClient]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Liefert die Lovelace-Karte aus und lädt sie automatisch im Frontend."""
+    try:
+        await hass.http.async_register_static_paths(
+            [StaticPathConfig(CARD_URL, str(CARD_PATH), True)]
+        )
+        add_extra_js_url(hass, f"{CARD_URL}?v={CARD_VERSION}")
+    except (RuntimeError, AttributeError) as err:  # z. B. ohne HTTP-Komponente
+        _LOGGER.warning("Hargassner-Karte konnte nicht registriert werden: %s", err)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: HargassnerConfigEntry) -> bool:

@@ -75,7 +75,11 @@ class HargassnerSensor(HargassnerEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
-        attrs = {"feldindex": self._field.index, "verifiziert": self._field.verified}
+        attrs = {
+            "schluessel": self._field.key,  # wird von der Lovelace-Karte genutzt
+            "feldindex": self._field.index,
+            "verifiziert": self._field.verified,
+        }
         if self._field.kind == "state":
             value = self._raw()
             attrs["code"] = int(value) if isinstance(value, float) else value
