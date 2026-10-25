@@ -16,9 +16,16 @@ die IP des Kessels eintragen.
 
 Die Integration bringt eine Karte im Stil des Kesseldisplays mit: Kessel mit Brennraum
 und Flammen, Puffer mit Temperaturverlauf, Boiler, Heizkreis 1 und Soll/Ist-Werte.
-Sie wird automatisch geladen: Die Integration trägt sie beim Start als Lovelace-Ressource
-(`/hargassner/hargassner-card.js`) ein und hält die Version aktuell. Nur im YAML-Modus von
-Lovelace muss die Ressource manuell eingetragen werden (Typ *JavaScript-Modul*).
+Sie wird automatisch geladen: Die Integration kopiert ein kleines Ladeskript nach
+`/config/www/hargassner/` und trägt es als Lovelace-Ressource ein
+(`/local/hargassner/hargassner-loader.js`). Das Ladeskript holt die eigentliche Karte und versucht
+es während des HA-Starts wiederholt, bis die Integration geladen ist. So erscheint nach einem
+Neustart kein „Custom element doesn't exist“ mehr.
+
+- Gab es `/config/www` beim Start noch nicht, wird der Ordner angelegt; das Ladeskript greift dann
+  ab dem nächsten Neustart (bis dahin wird die Karte direkt eingebunden).
+- Im YAML-Modus von Lovelace die Ressource `/local/hargassner/hargassner-loader.js` manuell
+  eintragen (Typ *JavaScript-Modul*).
 
 ![Hargassner-Karte](docs/card.png)
 

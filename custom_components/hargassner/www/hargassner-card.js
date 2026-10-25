@@ -11,7 +11,7 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.4.6";
+const CARD_VERSION = "0.5.0";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
@@ -292,7 +292,7 @@ class HargassnerCard extends HTMLElement {
             <text x="362" y="242" class="t sm dim">VL Soll</text>
             <text x="462" y="242" class="t sm" text-anchor="end">${fmt(d.hk1_vorlauf_soll, 0, "°C")}</text>
             <text x="362" y="262" class="t sm dim">Status</text>
-            <text x="462" y="262" class="t sm" text-anchor="end">${d._hk || (d.hk1_vorlauf_soll === null || d.hk1_vorlauf_soll === undefined ? "–" : hkOn ? "Ein" : "Aus")}</text>
+            <text x="462" y="262" class="t sm" text-anchor="end">${d._hk ? d._hk.replace(/^Zustand /, "Code ") : (d.hk1_vorlauf_soll === null || d.hk1_vorlauf_soll === undefined ? "–" : hkOn ? "Ein" : "Aus")}</text>
           </svg>
 
           ${this._config.show_values ? `
