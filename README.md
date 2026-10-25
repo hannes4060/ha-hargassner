@@ -16,7 +16,9 @@ die IP des Kessels eintragen.
 
 Die Integration bringt eine Karte im Stil des Kesseldisplays mit: Kessel mit Brennraum
 und Flammen, Puffer mit Temperaturverlauf, Boiler, Heizkreis 1 und Soll/Ist-Werte.
-Sie wird automatisch geladen, eine Ressource muss nicht eingetragen werden.
+Sie wird automatisch geladen: Die Integration trägt sie beim Start als Lovelace-Ressource
+(`/hargassner/hargassner-card.js`) ein und hält die Version aktuell. Nur im YAML-Modus von
+Lovelace muss die Ressource manuell eingetragen werden (Typ *JavaScript-Modul*).
 
 ![Hargassner-Karte](docs/card.png)
 

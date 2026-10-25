@@ -36,7 +36,42 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         add_extra_js_url(hass, f"{CARD_URL}?v={CARD_VERSION}")
     except (RuntimeError, AttributeError) as err:  # z. B. ohne HTTP-Komponente
         _LOGGER.warning("Hargassner-Karte konnte nicht registriert werden: %s", err)
+    await _async_register_lovelace_resource(hass)
     return True
+
+
+async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
+    """Trägt die Karte als Lovelace-Ressource ein (wie HACS).
+
+    Ressourcen lädt das Frontend dynamisch, auch wenn die Startseite in der App
+    oder im Browser gecacht ist. Vorhandene Einträge werden auf die aktuelle
+    Version gebracht, damit der Browser-Cache greift.
+    """
+    url = f"{CARD_URL}?v={CARD_VERSION}"
+    try:
+        data = hass.data.get("lovelace")
+        mode = getattr(data, "resource_mode", None) or getattr(data, "mode", None)
+        resources = getattr(data, "resources", None)
+        if resources is None or mode != "storage":
+            _LOGGER.info(
+                "Lovelace im YAML-Modus: Ressource %s bitte manuell eintragen", url
+            )
+            return
+        if not getattr(resources, "loaded", True):
+            await resources.async_load()
+            resources.loaded = True
+        for item in resources.async_items():
+            if item.get("url", "").split("?")[0] == CARD_URL:
+                if item["url"] != url:
+                    await resources.async_update_item(
+                        item["id"], {"res_type": "module", "url": url}
+                    )
+                    _LOGGER.info("Hargassner-Karte: Ressource auf %s aktualisiert", url)
+                return
+        await resources.async_create_item({"res_type": "module", "url": url})
+        _LOGGER.info("Hargassner-Karte: Ressource %s angelegt", url)
+    except Exception as err:  # noqa: BLE001 - Karte ist optional
+        _LOGGER.warning("Hargassner-Karte: Ressource nicht eingetragen: %s", err)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: HargassnerConfigEntry) -> bool:
