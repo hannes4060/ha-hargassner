@@ -14,34 +14,38 @@ die IP des Kessels eintragen.
 
 ## Sensoren
 
-Abgeglichen gegen den Cloud-Export (Stillstand und kompletter Abbrand).
+Abgeglichen gegen den Cloud-Export (Stillstand und Abbrand) und gegen Displayfotos (Anheizen).
 
 | Sensor | Feld | Status |
 |---|---|---|
-| Kesselzustand | 1 | Klartext teilweise vermutet (siehe unten) |
+| Kesselzustand | 1 | geprüft (Display) |
 | Sauerstoffgehalt Ist / Soll | 2 / 3 | geprüft |
 | Kesseltemperatur Ist / Soll | 4 / 5 | geprüft |
 | Rücklauftemperatur Ist / Soll | 6 / 7 | geprüft |
 | Rauchgastemperatur | 8 | geprüft |
 | Leistung | 9 | geprüft |
+| Saugzug Soll / Ist (%) | 10 / 11 | geprüft (Display) |
 | Puffer oben / Mitte / unten | 12 / 13 / 14 | geprüft |
 | Puffer Füllgrad | 17 | geprüft |
-| Primärluft / Sekundärluft | 21 / 23 | vermutet, nicht in der Cloud |
-| Saugzug Drehzahl | 26 | vermutet, nicht in der Cloud |
+| Primärluft Soll / Ist | 20 / 21 | geprüft (Display) |
+| Sekundärluft Soll / Ist | 22 / 23 | geprüft (Display) |
+| Saugzug Drehzahl | 26 | vermutet |
 | Außentemperatur / gemittelt | 32 / 33 | geprüft |
 | Höchste Anforderung | 34 | geprüft |
 | Höchste Anforderung Puffer | 35 | geprüft (Feld 54 verhält sich fast gleich) |
-| Vorlauf HK 1 | 53 | geprüft |
+| Puffer Solltemperatur / Ausschalttemperatur TPO | 41 / 42 | vermutet (Display 45 °C) |
+| Vorlauf Ist HK 1 | 53 | geprüft |
+| Vorlauf Soll HK 1 | 59 | vermutet |
 | Boiler 1 | 76 | geprüft |
 
 ### Kesselzustand (Feld 1)
 
-| Code | Klartext | Sicherheit |
-|---|---|---|
-| 1 | Aus | sicher |
-| 13 | Heiztür offen | vermutet (Saugzug läuft, Rauchgas kühlt ab, vor der Zündung) |
-| 4 | Anheizen | vermutet (Leistung 100 %, O₂ 21 %, Rauchgas steigt) |
-| 6 | Heizen | vermutet (stabiler Abbrand, Rauchgas ~220 °C) |
+| Code | Klartext |
+|---|---|
+| 1 | Aus |
+| 13 | Tür offen |
+| 4 | Anheizen |
+| 6 | Leistungsbrand |
 
 Unbekannte Codes erscheinen als „Zustand N“. Der Zahlenwert steht im Attribut `code`.
 

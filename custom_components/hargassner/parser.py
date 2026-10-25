@@ -22,14 +22,13 @@ class FieldDef:
     verified: bool = True  # gegen Cloud-Export abgeglichen
 
 
-# Kesselzustände (Feld 1), beobachtet beim Neo HV 30.
-# 1 ist sicher (Stillstand). Die übrigen Namen sind aus dem Verlauf abgeleitet
-# (Saugzug, Luftklappen, Rauchgas) und noch mit dem Display zu bestätigen.
+# Kesselzustände (Feld 1), beim Neo HV 30 mit dem Display bestätigt
+# (Displayfotos 25.10.2026: Aus -> Tür offen -> Anheizen -> Leistungsbrand).
 KESSEL_ZUSTAENDE: dict[int, str] = {
     1: "Aus",
     4: "Anheizen",
-    6: "Heizen",
-    13: "Heiztür offen",
+    6: "Leistungsbrand",
+    13: "Tür offen",
 }
 
 
@@ -44,17 +43,24 @@ def zustand_text(value: float | str | None) -> str | None:
     return KESSEL_ZUSTAENDE.get(code, f"Zustand {code}")
 
 
-# verified=True: gegen Cloud-Export abgeglichen
-#   (20.10.2026 Stillstand, 21.10.2026 12:20-14:24 inkl. Abbrand).
-# verified=False: aus dem Verlauf abgeleitet, nicht in der Cloud vorhanden.
+# verified=True: gegen Cloud-Export (20./21.10.2026) oder Displayfotos
+#   (25.10.2026, Info/Kessel beim Anheizen) abgeglichen.
+# verified=False: aus dem Verlauf abgeleitet, noch nicht bestätigt.
 FIELDS: tuple[FieldDef, ...] = (
-    FieldDef("kessel_zustand", 1, "Kesselzustand", None, "state", False),
+    FieldDef("kessel_zustand", 1, "Kesselzustand", None, "state"),
     FieldDef("o2_ist", 2, "Sauerstoffgehalt Ist", "%", "percent"),
     FieldDef("o2_soll", 3, "Sauerstoffgehalt Soll", "%", "percent"),
     FieldDef("leistung", 9, "Leistung", "%", "percent"),
+    FieldDef("saugzug_soll", 10, "Saugzug Soll", "%", "percent"),
+    FieldDef("saugzug_ist", 11, "Saugzug Ist", "%", "percent"),
     FieldDef("saugzug", 26, "Saugzug Drehzahl", "U/min", "rpm", False),
-    FieldDef("primaerluft", 21, "Primärluft", "%", "percent", False),
-    FieldDef("sekundaerluft", 23, "Sekundärluft", "%", "percent", False),
+    FieldDef("primaerluft_soll", 20, "Primärluft Soll", "%", "percent"),
+    FieldDef("primaerluft", 21, "Primärluft Ist", "%", "percent"),
+    FieldDef("sekundaerluft_soll", 22, "Sekundärluft Soll", "%", "percent"),
+    FieldDef("sekundaerluft", 23, "Sekundärluft Ist", "%", "percent"),
+    FieldDef("puffer_soll_tpo", 41, "Puffer Solltemperatur TPO", "°C", "temperature", False),
+    FieldDef("puffer_aus_tpo", 42, "Puffer Ausschalttemperatur TPO", "°C", "temperature", False),
+    FieldDef("hk1_vorlauf_soll", 59, "Vorlauf Soll HK 1", "°C", "temperature", False),
     FieldDef("hoechste_anforderung", 34, "Höchste Anforderung", "°C"),
     FieldDef("puffer_anforderung", 35, "Höchste Anforderung Puffer", "°C"),
     FieldDef("kessel_ist", 4, "Kesseltemperatur Ist", "°C"),
@@ -68,7 +74,7 @@ FIELDS: tuple[FieldDef, ...] = (
     FieldDef("puffer_fuellgrad", 17, "Puffer Füllgrad", "%", "percent"),
     FieldDef("aussen", 32, "Außentemperatur", "°C"),
     FieldDef("aussen_gemittelt", 33, "Außentemperatur gemittelt", "°C"),
-    FieldDef("hk1_vorlauf_ist", 53, "Vorlauf HK 1", "°C"),
+    FieldDef("hk1_vorlauf_ist", 53, "Vorlauf Ist HK 1", "°C"),
     FieldDef("boiler1", 76, "Boiler 1", "°C"),
 )
 

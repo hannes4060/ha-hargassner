@@ -80,6 +80,19 @@ def test_abbrand_matches_cloud():
 
 def test_zustand_text():
     assert parser.zustand_text(1.0) == "Aus"
-    assert parser.zustand_text(6.0) == "Heizen"
+    assert parser.zustand_text(6.0) == "Leistungsbrand"
+    assert parser.zustand_text(13.0) == "Tür offen"
     assert parser.zustand_text(99.0) == "Zustand 99"
     assert parser.zustand_text(None) is None
+
+
+def test_anheizen_matches_display():
+    """Displayfoto Info/Kessel beim Anheizen: Saugzug 90/90, Primärluft 85/85,
+    Sekundärluft 5/5. Gleiche Phase im Mitschnitt vom 21.10.2026, 13:08."""
+    line = ("pm 4 18.3 11.1 31.8 80 33.3 65 64.4 100 90 90 31.6 31.3 31.6 15 0 22.3 0 3 "
+            "85 86 5 4 8.17 13.63 600")
+    t = parser.parse_line(line)
+    assert t.values["saugzug_soll"] == 90 and t.values["saugzug_ist"] == 90
+    assert t.values["primaerluft_soll"] == 85 and t.values["primaerluft"] == 86
+    assert t.values["sekundaerluft_soll"] == 5 and t.values["sekundaerluft"] == 4
+    assert parser.zustand_text(t.values["kessel_zustand"]) == "Anheizen"
