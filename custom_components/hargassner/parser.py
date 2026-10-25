@@ -33,13 +33,12 @@ KESSEL_ZUSTAENDE: dict[int, str] = {
 }
 
 
-# Status Heizkreis 1 (Feld 57).
-# 1 = Heizen ist mit dem Display bestätigt. 4 = Aus ist aus dem Verlauf abgeleitet
-# (nach dem Abschalten, Vorlauf-Soll 0). 3 kam bei Vorlauf-Soll 40 vor, die
-# Bedeutung ist noch offen und erscheint daher als "Zustand 3".
+# Status Heizkreis 1 (Feld 57), mit dem Display bestätigt: 0 = Aus, 1 = Heizen.
+# 3 und 4 kamen im Mitschnitt vom 21.10. vor (3 bei Vorlauf-Soll 40, 4 bei 0),
+# ihre Bedeutung ist noch offen; sie erscheinen als "Zustand 3" / "Zustand 4".
 HK_ZUSTAENDE: dict[int, str] = {
+    0: "Aus",
     1: "Heizen",
-    4: "Aus",
 }
 
 

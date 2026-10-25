@@ -106,4 +106,5 @@ def test_hk1():
     t = parser.parse_line(" ".join(parts))
     assert t.values["hk1_vorlauf_soll"] == 40
     assert parser.hk_text(t.values["hk1_status"]) == "Heizen"
-    assert parser.hk_text(4.0) == "Aus"
+    assert parser.hk_text(0.0) == "Aus"
+    assert parser.hk_text(4.0) == "Zustand 4"
