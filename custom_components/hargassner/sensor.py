@@ -55,6 +55,9 @@ class HargassnerSensor(HargassnerEntity, SensorEntity):
         super().__init__(client, entry_id, field.key)
         self._field = field
         self._attr_name = field.name
+        # Stabiler Schlüssel für die Lovelace-Karte; steht in der Entity-Registry
+        # und bleibt dadurch auch erhalten, wenn der Sensor nicht verfügbar ist.
+        self._attr_translation_key = field.key
         if field.kind == "temperature":
             self._attr_device_class = SensorDeviceClass.TEMPERATURE
             self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS

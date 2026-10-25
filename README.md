@@ -30,7 +30,8 @@ title: Holzvergaser    # optional
 show_values: true      # optional, Soll/Ist-Tabelle
 ```
 
-Die Sensoren werden über ihr Attribut `schluessel` gefunden, es ist keine Konfiguration nötig.
+Die Karte findet die Sensoren selbst (über die Entity-Registry, Plattform `hargassner`), es ist keine
+Konfiguration nötig. Reißt die Verbindung zum Kessel ab, zeigt die Karte einen Hinweis statt leerer Werte.
 
 ## Sensoren
 

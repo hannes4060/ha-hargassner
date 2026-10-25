@@ -26,6 +26,7 @@ class HargassnerConnection(HargassnerEntity, BinarySensorEntity):
     """Zeigt an, ob der Telnet-Datenstrom läuft."""
 
     _attr_name = "Verbindung"
+    _attr_translation_key = "verbindung"
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 

@@ -11,7 +11,7 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.4.2";
+const CARD_VERSION = "0.4.3";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
@@ -44,6 +44,7 @@ class HargassnerCard extends HTMLElement {
     this._config = { show_values: true, ...config };
     if (!this.shadowRoot) this.attachShadow({ mode: "open" });
     this._lastKey = null;
+    if (this._hass) this.hass = this._hass;
   }
 
   static getStubConfig() {
@@ -56,33 +57,79 @@ class HargassnerCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    const data = this._collect(hass);
+    if (!this._config || !this.shadowRoot) return; // setConfig kommt noch
+    let data;
+    try {
+      data = this._collect(hass);
+    } catch (err) {
+      this._renderError(err);
+      return;
+    }
     const key = JSON.stringify(data);
     if (key === this._lastKey) return;
     this._lastKey = key;
-    this._render(data);
+    try {
+      this._render(data);
+    } catch (err) {
+      this._renderError(err);
+    }
   }
 
-  // Alle Sensoren der Integration über das Attribut "schluessel" einsammeln
-  _collect(hass) {
-    const v = {};
-    let state = null;
+  _renderError(err) {
+    console.error("hargassner-card:", err);
+    this.shadowRoot.innerHTML = `<style>${STYLE}</style><ha-card><div class="screen">
+      <div class="notice err">Hargassner-Karte: Fehler beim Zeichnen<br><small>${String(
+        (err && err.message) || err
+      ).replace(/</g, "&lt;")}</small></div></div></ha-card>`;
+  }
+
+  // Ordnet Entity-IDs den Feldschlüsseln zu. Primär über die Entity-Registry
+  // (Plattform "hargassner" + translation_key), weil HA bei nicht verfügbaren
+  // Sensoren die Zusatz-Attribute (auch "schluessel") weglässt.
+  _keymap(hass) {
+    const map = {};
+    for (const [id, e] of Object.entries(hass.entities || {})) {
+      if (e && e.platform === "hargassner" && e.translation_key) map[id] = e.translation_key;
+    }
     for (const [id, st] of Object.entries(hass.states)) {
       const k = st.attributes && st.attributes.schluessel;
-      if (!k || !id.startsWith("sensor.")) continue;
-      if (k === "kessel_zustand") {
-        state = st.state;
-        continue;
-      }
-      if (k === "hk1_status") {
-        v._hk = st.state;
-        continue;
-      }
-      const n = parseFloat(st.state);
-      v[k] = Number.isNaN(n) ? null : n;
+      if (k && !map[id]) map[id] = k;
     }
-    v._state = state;
+    return map;
+  }
+
+  _collect(hass) {
+    const v = { _state: null, _hk: null, _found: 0, _unavail: 0, _conn: null };
+    const map = this._keymap(hass);
+    for (const [id, k] of Object.entries(map)) {
+      const st = hass.states[id];
+      if (!st) continue;
+      if (k === "verbindung") {
+        v._conn = st.state === "on";
+        continue;
+      }
+      if (!id.startsWith("sensor.")) continue;
+      v._found++;
+      const bad = st.state === "unavailable" || st.state === "unknown";
+      if (bad) v._unavail++;
+      if (k === "kessel_zustand") {
+        v._state = bad ? null : st.state;
+      } else if (k === "hk1_status") {
+        v._hk = bad ? null : st.state;
+      } else {
+        const n = parseFloat(st.state);
+        v[k] = Number.isNaN(n) ? null : n;
+      }
+    }
     return v;
+  }
+
+  _notice(d) {
+    if (d._found === 0)
+      return `<div class="notice err">Keine Hargassner-Sensoren gefunden.<br><small>Ist die Integration „Hargassner (lokal)“ eingerichtet und aktiv?</small></div>`;
+    if (d._conn === false || d._unavail >= d._found)
+      return `<div class="notice">Keine Verbindung zum Kessel – die Integration verbindet automatisch neu.<br><small>Läuft parallel ein anderer Telnet-Client (z. B. nc)? Der Kessel lässt evtl. nur eine Verbindung zu.</small></div>`;
+    return "";
   }
 
   _row(label, soll, ist, unit, max) {
@@ -145,6 +192,7 @@ class HargassnerCard extends HTMLElement {
             </span>
             <span class="out">Außen ${fmt(d.aussen, 0, " °C")}<small> · Ø ${fmt(d.aussen_gemittelt, 0, " °C")}</small></span>
           </div>
+          ${this._notice(d)}
           <svg viewBox="0 0 480 290" class="scene" role="img" aria-label="Kessel, Puffer und Boiler">
             <defs>
               <linearGradient id="hg-puf" x1="0" y1="0" x2="0" y2="1">
@@ -239,7 +287,7 @@ class HargassnerCard extends HTMLElement {
             <text x="362" y="242" class="t sm dim">VL Soll</text>
             <text x="462" y="242" class="t sm" text-anchor="end">${fmt(d.hk1_vorlauf_soll, 0, "°C")}</text>
             <text x="362" y="262" class="t sm dim">Status</text>
-            <text x="462" y="262" class="t sm" text-anchor="end">${d._hk || (hkOn ? "Ein" : "Aus")}</text>
+            <text x="462" y="262" class="t sm" text-anchor="end">${d._hk || (d.hk1_vorlauf_soll === null || d.hk1_vorlauf_soll === undefined ? "–" : hkOn ? "Ein" : "Aus")}</text>
           </svg>
 
           ${this._config.show_values ? `
@@ -272,6 +320,10 @@ const STYLE = `
   .state.warn i { background:var(--hg-yellow); }
   .out { color:var(--hg-text); } .out small { color:var(--hg-dim); font-size:12px; }
   .scene { width:100%; height:auto; display:block; }
+  .notice { margin:6px 0 4px; padding:8px 10px; border-radius:8px; font-size:12.5px; line-height:1.4;
+            background:#3a3216; color:#f2d98a; border:1px solid #5a4c1c; }
+  .notice.err { background:#3a1a16; color:#f2b3a8; border-color:#5a2a22; }
+  .notice small { color:inherit; opacity:.8; }
   .t { fill:var(--hg-text); font-family:inherit; }
   .t.big { font-size:17px; font-weight:600; } .t.mid { font-size:14px; } .t.sm { font-size:11.5px; }
   .t.dim { fill:var(--hg-dim); }
