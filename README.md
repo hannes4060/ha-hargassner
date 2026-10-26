@@ -83,6 +83,11 @@ Unbekannte Codes erscheinen als „Zustand N“. Der Zahlenwert steht im Attribu
 Zusätzlich gibt es für jedes andere Feld einen deaktivierten Diagnose-Sensor
 „Rohwert Feld N“. Damit lassen sich weitere Werte zuordnen.
 
+## Versionen
+
+Jede neue Version in `manifest.json` erzeugt per GitHub Action automatisch ein Release
+(`.github/workflows/release.yml`). HACS zeigt dadurch die Versionsnummer statt eines Commit-Hashes.
+
 ## Optionen
 
 - **Aktualisierungsintervall** (Standard 10 s): Der Kessel sendet etwa jede Sekunde.
