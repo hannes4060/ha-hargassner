@@ -11,9 +11,9 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.5.0";
+const CARD_VERSION = "0.5.1";
 
-const BURNING = new Set(["Anheizen", "Leistungsbrand"]);
+const BURNING = new Set(["Anheizen", "Leistungsbrand", "Ausbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
 const GLOW = new Set(["Restwärme"]);
 
@@ -238,7 +238,7 @@ class HargassnerCard extends HTMLElement {
             <rect x="164" y="210" width="9" height="40" class="flap y"/>
 
             <!-- Füllraum -->
-            ${loaded ? this._logs() : `<text x="105" y="150" class="t mid dim" text-anchor="middle">Füllen</text>`}
+            ${loaded ? this._logs() : burning || GLOW.has(st) ? "" : `<text x="105" y="150" class="t mid dim" text-anchor="middle">Füllen</text>`}
 
             <!-- Brennraum -->
             <rect x="50" y="188" width="108" height="54" class="grate"/>

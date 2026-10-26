@@ -75,6 +75,7 @@ Abgeglichen gegen den Cloud-Export (Stillstand und Abbrand) und gegen Displayfot
 | 13 | Tür offen |
 | 4 | Anheizen |
 | 6 | Leistungsbrand |
+| 9 | Ausbrand |
 | 11 | Restwärme |
 
 Unbekannte Codes erscheinen als „Zustand N“. Der Zahlenwert steht im Attribut `code`.

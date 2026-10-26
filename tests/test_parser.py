@@ -82,6 +82,7 @@ def test_zustand_text():
     assert parser.zustand_text(1.0) == "Aus"
     assert parser.zustand_text(6.0) == "Leistungsbrand"
     assert parser.zustand_text(13.0) == "Tür offen"
+    assert parser.zustand_text(9.0) == "Ausbrand"
     assert parser.zustand_text(11.0) == "Restwärme"
     assert parser.zustand_text(99.0) == "Zustand 99"
     assert parser.zustand_text(None) is None
