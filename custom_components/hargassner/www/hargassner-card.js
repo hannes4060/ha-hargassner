@@ -11,7 +11,7 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.5.1";
+const CARD_VERSION = "0.5.2";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand", "Ausbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
@@ -179,9 +179,10 @@ class HargassnerCard extends HTMLElement {
     const kColor = tempColor(d.kessel_ist, 30, 85);
     const fill = d.puffer_fuellgrad;
     const fillY = 104 + 160 * (1 - Math.max(0, Math.min(100, fill || 0)) / 100);
+    const hkEco = d._hk === "Absenken";
     const hkOn =
       d._hk === "Heizen" ? true
-      : d._hk === "Aus" ? false
+      : d._hk === "Aus" || hkEco ? false
       : d.hk1_vorlauf_soll !== null && d.hk1_vorlauf_soll !== undefined && d.hk1_vorlauf_soll > 0;
     const title = this._config.title ? `<div class="title">${this._config.title}</div>` : "";
 
@@ -286,7 +287,7 @@ class HargassnerCard extends HTMLElement {
             <!-- Heizkreis 1 -->
             <rect x="350" y="176" width="122" height="96" rx="6" class="box"/>
             <text x="362" y="198" class="t mid">HK 1</text>
-            <circle cx="456" cy="193" r="6" class="sun ${hkOn ? "on" : ""}"/>
+            <circle cx="456" cy="193" r="6" class="sun ${hkOn ? "on" : hkEco ? "eco" : ""}"/>
             <text x="362" y="222" class="t sm dim">VL Ist</text>
             <text x="462" y="222" class="t sm" text-anchor="end">${fmt(d.hk1_vorlauf_ist, 0, "°C")}</text>
             <text x="362" y="242" class="t sm dim">VL Soll</text>
@@ -361,6 +362,7 @@ const STYLE = `
   .coil path { fill:none; stroke:#f2e6e6; stroke-width:2; opacity:.75; }
   .box { fill:var(--hg-panel); stroke:#3a3d46; }
   .sun { fill:#4a4d55; transition:fill .4s; }
+  .sun.eco { fill:#8fb4e8; filter:drop-shadow(0 0 3px #8fb4e8); }
   .sun.on { fill:var(--hg-yellow); filter:drop-shadow(0 0 5px var(--hg-yellow)); animation:sunglow 2.4s ease-in-out infinite; }
   @keyframes sunglow { 0%,100% { filter:drop-shadow(0 0 3px var(--hg-yellow)); } 50% { filter:drop-shadow(0 0 8px var(--hg-yellow)); } }
   .vals { margin-top:10px; border-top:1px solid #2e3139; padding-top:8px; display:grid; gap:5px; }

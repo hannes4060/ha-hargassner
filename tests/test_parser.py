@@ -108,4 +108,5 @@ def test_hk1():
     assert t.values["hk1_vorlauf_soll"] == 40
     assert parser.hk_text(t.values["hk1_status"]) == "Heizen"
     assert parser.hk_text(0.0) == "Aus"
+    assert parser.hk_text(2.0) == "Absenken"
     assert parser.hk_text(4.0) == "Zustand 4"
