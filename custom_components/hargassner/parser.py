@@ -35,13 +35,14 @@ KESSEL_ZUSTAENDE: dict[int, str] = {
 
 
 # Status Heizkreis 1 (Feld 57), mit dem Display bestätigt:
-#   0 = Aus, 1 = Heizen, 2 = Absenken (im Display "Absenken Rampe"), 3 = Absenken.
-# 4 kam im Mitschnitt vom 21.10. vor (Vorlauf-Soll 0), Bedeutung noch offen.
+#   0 = Aus, 1 = Heizen, 2 = Absenken (im Display "Absenken Rampe"), 3 = Absenken,
+#   4 = Tag/Nachtabschaltung.
 HK_ZUSTAENDE: dict[int, str] = {
     0: "Aus",
     1: "Heizen",
     2: "Absenken",
     3: "Absenken",
+    4: "Tag/Nachtabschaltung",
 }
 
 

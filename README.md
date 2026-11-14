@@ -64,7 +64,7 @@ Abgeglichen gegen den Cloud-Export (Stillstand und Abbrand) und gegen Displayfot
 | Puffer Solltemperatur / Ausschalttemperatur TPO | 41 / 42 | vermutet (Display 45 °C) |
 | Vorlauf Ist HK 1 | 53 | geprüft |
 | Vorlauf Soll HK 1 | 54 | geprüft (Display) |
-| Status HK 1 (0 = Aus, 1 = Heizen, 2/3 = Absenken) | 57 | geprüft (Display), 4 noch offen |
+| Status HK 1 (0 = Aus, 1 = Heizen, 2/3 = Absenken, 4 = Tag/Nachtabschaltung) | 57 | geprüft (Display) |
 | Boiler 1 | 76 | geprüft |
 
 ### Kesselzustand (Feld 1)

@@ -11,11 +11,12 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.5.3";
+const CARD_VERSION = "0.5.4";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand", "Ausbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
 const GLOW = new Set(["Restwärme"]);
+const HK_SHORT = { "Tag/Nachtabschaltung": "Abschaltung T/N" };
 
 // Temperatur -> Farbe wie im Display: kalt blau, mittel violett, heiß rot
 function tempColor(t, cold = 30, hot = 65) {
@@ -180,10 +181,16 @@ class HargassnerCard extends HTMLElement {
     const fill = d.puffer_fuellgrad;
     const fillY = 104 + 160 * (1 - Math.max(0, Math.min(100, fill || 0)) / 100);
     const hkEco = d._hk === "Absenken";
+    const hkOff = d._hk === "Aus" || d._hk === "Tag/Nachtabschaltung";
     const hkOn =
       d._hk === "Heizen" ? true
-      : d._hk === "Aus" || hkEco ? false
+      : hkOff || hkEco ? false
       : d.hk1_vorlauf_soll !== null && d.hk1_vorlauf_soll !== undefined && d.hk1_vorlauf_soll > 0;
+    // Kurzform für den schmalen HK-Kasten; der Sensor behält den vollen Text
+    const hkText = d._hk
+      ? (HK_SHORT[d._hk] || d._hk).replace(/^Zustand /, "Code ")
+      : d.hk1_vorlauf_soll === null || d.hk1_vorlauf_soll === undefined ? "–" : hkOn ? "Ein" : "Aus";
+    const hkLong = hkText.length > 9;
     const title = this._config.title ? `<div class="title">${this._config.title}</div>` : "";
 
     this.shadowRoot.innerHTML = `
@@ -292,8 +299,10 @@ class HargassnerCard extends HTMLElement {
             <text x="462" y="222" class="t sm" text-anchor="end">${fmt(d.hk1_vorlauf_ist, 0, "°C")}</text>
             <text x="362" y="242" class="t sm dim">VL Soll</text>
             <text x="462" y="242" class="t sm" text-anchor="end">${fmt(d.hk1_vorlauf_soll, 0, "°C")}</text>
-            <text x="362" y="262" class="t sm dim">Status</text>
-            <text x="462" y="262" class="t sm" text-anchor="end">${d._hk ? d._hk.replace(/^Zustand /, "Code ") : (d.hk1_vorlauf_soll === null || d.hk1_vorlauf_soll === undefined ? "–" : hkOn ? "Ein" : "Aus")}</text>
+            ${hkLong
+              ? `<text x="362" y="262" class="t sm">${hkText}</text>`
+              : `<text x="362" y="262" class="t sm dim">Status</text>
+            <text x="462" y="262" class="t sm" text-anchor="end">${hkText}</text>`}
           </svg>
 
           ${this._config.show_values ? `

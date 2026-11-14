@@ -110,4 +110,4 @@ def test_hk1():
     assert parser.hk_text(0.0) == "Aus"
     assert parser.hk_text(2.0) == "Absenken"
     assert parser.hk_text(3.0) == "Absenken"
-    assert parser.hk_text(4.0) == "Zustand 4"
+    assert parser.hk_text(4.0) == "Tag/Nachtabschaltung"
