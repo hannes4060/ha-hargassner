@@ -11,7 +11,7 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.5.5";
+const CARD_VERSION = "0.5.6";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand", "Ausbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);

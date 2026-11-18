@@ -84,6 +84,14 @@ Unbekannte Codes erscheinen als „Zustand N“. Der Zahlenwert steht im Attribu
 Zusätzlich gibt es für jedes andere Feld einen deaktivierten Diagnose-Sensor
 „Rohwert Feld N“. Damit lassen sich weitere Werte zuordnen.
 
+## Logo
+
+<img src="custom_components/hargassner/brand/icon.png" width="64" alt="Logo">
+
+Die Integration bringt ihr Icon selbst mit (`custom_components/hargassner/brand/`,
+`icon.png` 256 px und `icon@2x.png` 512 px). Home Assistant zeigt es ab Version 2026.3 an.
+Die Vektorvorlage liegt unter `docs/logo.svg`.
+
 ## Versionen
 
 Jede neue Version in `manifest.json` erzeugt per GitHub Action automatisch ein Release
