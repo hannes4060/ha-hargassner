@@ -11,11 +11,11 @@
  *   show_values: true            # optional, Soll/Ist-Tabelle
  */
 
-const CARD_VERSION = "0.5.4";
+const CARD_VERSION = "0.5.5";
 
 const BURNING = new Set(["Anheizen", "Leistungsbrand", "Ausbrand"]);
 const LOADED = new Set(["Tür offen", "Anheizen", "Leistungsbrand"]);
-const GLOW = new Set(["Restwärme"]);
+const GLOW = new Set(["Gluterhaltung", "Restwärme"]);
 const HK_SHORT = { "Tag/Nachtabschaltung": "Abschaltung T/N" };
 
 // Temperatur -> Farbe wie im Display: kalt blau, mittel violett, heiß rot
@@ -358,7 +358,7 @@ const STYLE = `
   .ring { fill:none; stroke:#8c7b58; stroke-width:1; }
   .grate { fill:#141519; stroke:#2c2f36; }
   .flame { animation:flicker 1.2s ease-in-out infinite alternate; }
-  .glow { animation:pulse 2.4s ease-in-out infinite; }
+  .glow { filter:drop-shadow(0 0 6px #e8541a) drop-shadow(0 -2px 4px #ffb347); animation:pulse 2.4s ease-in-out infinite; }
   .flame.f1 { fill:#f08a1c; } .flame.f2 { fill:#e8541a; } .flame.f3 { fill:#ffd25a; }
   .line { stroke-width:5; fill:none; } .line.hot { stroke:var(--hg-red); } .line.cold { stroke:var(--hg-blue); }
   .pump { fill:#20232a; stroke:#d8d4cc; stroke-width:2.5; }
